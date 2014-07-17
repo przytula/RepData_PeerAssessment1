@@ -39,21 +39,50 @@ NOTE: The GitHub repository also contains the dataset for the assignment so you 
  
  r code for previous list
  
-```{r, echo=TRUE}
+
+```r
 library(sqldf)
 library(lattice)
 activity<-read.csv("activity.csv")
 cat("The total number of rows with NA s : ",nrow(activity[is.na(activity$steps),]))
+```
+
+```
+## The total number of rows with NA s :  2304
+```
+
+```r
 na_activity<-activity[!is.na(activity$steps),]
 nna_activity<-activity[is.na(activity$steps),]
 sum_na<-sqldf("SELECT date,sum(steps) as sum_steps from na_activity group by date")
 sum_na$dt<-as.POSIXct(as.character(sum_na$date), format = "%Y-%m-%d")
 cat("Mean of steps dataset NA ignored : ",mean(sum_na$sum_steps))
+```
+
+```
+## Mean of steps dataset NA ignored :  10766
+```
+
+```r
 cat("Median of steps dataset NA ignored : ",median(sum_na$sum_steps))
+```
+
+```
+## Median of steps dataset NA ignored :  10765
+```
+
+```r
 avgsteps<-sqldf("SELECT date,interval,avg(steps) as avg_steps from na_activity group by interval")
 top<-as.matrix(head(sqldf("SELECT interval,avg(steps) as avg_steps,sum(steps) as sum_steps from na_activity group by interval order by sum_steps desc"),1))
 top_no <- matrix(top,  dimnames = NULL)
 cat("interval : ",top_no[1]," avg_steps : ",top_no[2]," sum_steps : ",top_no[3])
+```
+
+```
+## interval :  835  avg_steps :  206.2  sum_steps :  10927
+```
+
+```r
 mnna_activity<-sqldf("select avg_steps ,n.date,n.interval from nna_activity n join avgsteps a using(interval)")
 colnames(mnna_activity)<-c("steps","date","interval")
 t_activity<-rbind(na_activity,mnna_activity)
@@ -69,7 +98,21 @@ t_activity$day<-gsub("Sunday", "1", t_activity$day)
 sum_t<-sqldf("SELECT date,sum(steps) as sum_steps from t_activity group by date")
 sum_t$dt<-as.POSIXct(as.character(sum_t$date), format = "%Y-%m-%d")
 cat("Mean of steps total dataset : ",mean(sum_t$sum_steps))
+```
+
+```
+## Mean of steps total dataset :  10766
+```
+
+```r
 cat("Median of steps total dataset : ",median(sum_t$sum_steps))
+```
+
+```
+## Median of steps total dataset :  10766
+```
+
+```r
 t_avgsteps<-sqldf("SELECT day,interval,avg(steps) as avg_steps,day from t_activity group by day,interval")
 ```
  
@@ -81,17 +124,7 @@ t_avgsteps<-sqldf("SELECT day,interval,avg(steps) as avg_steps,day from t_activi
  
  r plot code
  
-```{r, echo=FALSE}
-plot(sum_na$dt,sum_na$sum_steps,type="h",xlab="Date",ylab="Nbr of steps")
-title(main="Nbr of steps by date for dataset NA ignored")
-plot(avgsteps$interval,avgsteps$avg_steps,type="l",xlab="interval",ylab="avg_steps")
-title(main="Avg nbr of steps by interval over all dates")
-plot(sum_t$dt,sum_t$sum_steps,type="h",xlab="Date",ylab="Nbr of steps")
-title(main="Nbr of steps by date for complete dataset")
-
-xyplot(avg_steps~interval|day,data=t_avgsteps,type='l',distribute.type=TRUE,main="AVG steps by interval weekday=0/weekend=1")
-
-```
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-21.png) ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-22.png) ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-23.png) ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-24.png) 
  
 End of File
  
