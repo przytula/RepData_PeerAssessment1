@@ -81,7 +81,7 @@ t_avgsteps<-sqldf("SELECT day,interval,avg(steps) as avg_steps,day from t_activi
  
  r plot code
  
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 plot(sum_na$dt,sum_na$sum_steps,type="h",xlab="Date",ylab="Nbr of steps")
 title(main="Nbr of steps by date for dataset NA ignored")
 plot(avgsteps$interval,avgsteps$avg_steps,type="l",xlab="interval",ylab="avg_steps")
